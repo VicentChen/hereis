@@ -38,6 +38,22 @@ public class MenuService {
     }
 
     /**
+     * 返回上一条被插入的记录的自增id，必须插入后马上使用
+     * @return id
+     */
+    public Integer getLastInsertId() {
+
+        Integer id;
+        try {
+            MenuMapper menuMapper = sqlSession.getMapper(MenuMapper.class);
+            id = menuMapper.selectLastInsertId("select last_insert_id()");
+        } catch (RuntimeException e) {
+            throw new MenuServiceException(MenuServiceException.INVALID_INPUT);
+        }
+        return id;
+    }
+
+    /**
      * 传入菜单的id，删除对应的菜单
      *
      * @param id 菜单id，必须大于0
@@ -124,17 +140,17 @@ public class MenuService {
      * @param category 菜单类别
      * @return 返回所有菜单组成的列表
      */
-    public List<Menu> getMenuByCategory(Integer spotId, String category) {
+    public List<Menu> getMenuByCategory(String category) {
 
         //检查输入
-        if (null == spotId || spotId <= 0 || null == category) {
+        if (null == category) {
             throw new MenuServiceException(MenuServiceException.INVALID_INPUT);
         }
 
         //根据类别查找菜单
         MenuMapper menuMapper = sqlSession.getMapper(MenuMapper.class);
         MenuExample menuExample = new MenuExample();
-        menuExample.createCriteria().andCategoryEqualTo(category).andSpotIdEqualTo(spotId);
+        menuExample.createCriteria().andCategoryEqualTo(category);
 
         List<Menu> menus = menuMapper.selectByExample(menuExample);
 
@@ -159,21 +175,5 @@ public class MenuService {
         Menu menu = menuMapper.selectByPrimaryKey(id);
 
         return menu;
-    }
-
-    /**
-     * 返回上一条被插入的记录的自增id，必须插入后马上使用
-     * @return id
-     */
-    public Integer getLastInsertId() {
-
-        Integer id;
-        try {
-            MenuMapper menuMapper = sqlSession.getMapper(MenuMapper.class);
-            id = menuMapper.selectLastInsertId("select last_insert_id()");
-        } catch (RuntimeException e) {
-            throw new MenuServiceException(MenuServiceException.INVALID_INPUT);
-        }
-        return id;
     }
 }

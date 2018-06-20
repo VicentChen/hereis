@@ -43,7 +43,7 @@ public class MenuController {
         for (String category :
                 categories) {
             //先获取该分类下的菜单
-            menus = menuService.getMenuByCategory(category);
+            menus = menuService.getMenuByCategory(spotId, category);
             //再封装返回结果
             menuResult = new MenuResult(category, menus);
             menuResultArray[i++] = menuResult;
@@ -55,11 +55,10 @@ public class MenuController {
     /**
      * 添加新的菜单
      * @param menu 菜单对象
-     * @return
+     * @return 菜单id
      */
     @PostMapping("/addMenu")
-    public void addMenu(Menu menu) {
-
+    public Integer addMenu(Menu menu) {
         if (menu != null) {
             // 如果该餐馆未存在则先插入餐馆记录
             if (restaurantService.restaurantExists(menu.getSpotId())) {
@@ -70,5 +69,8 @@ public class MenuController {
             // 插入菜单记录
             menuService.addMenu(menu);
         }
+        return menuService.getLastInsertId();
     }
 }
+
+
